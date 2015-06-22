@@ -3,7 +3,9 @@ Copyright (c) 2014 Intel Corporation. All rights reserved.
 Use of this source code is governed by a MIT-style license that can be
 found in the LICENSE file.
 */
-self.addEventListener ("message", computeFrame, false);
+"use strict";
+
+self.addEventListener("message", computeFrame, false);
 
 var max_iterations;
 var image_buffer;
@@ -25,7 +27,7 @@ function computeFrame(e) {
 
   drawMandelbrot(message);
 
-  self.postMessage({worker_index: e.data.worker_index, message: message, buffer: e.data.buffer}, [e.data.buffer]);
+  self.postMessage({ worker_index: e.data.worker_index, message: message, buffer: e.data.buffer }, [e.data.buffer]);
 }
 
 function mandelx1(c_re, c_im) {
@@ -38,11 +40,10 @@ function mandelx1(c_re, c_im) {
     var z_re2 = z_re * z_re;
     var z_im2 = z_im * z_im;
 
-    if (z_re2 + z_im2 > 4.0)
-      break;
+    if (z_re2 + z_im2 > 4) break;
 
     var new_re = z_re2 - z_im2;
-    var new_im = 2.0 * z_re * z_im;
+    var new_im = 2 * z_re * z_im;
 
     z_re = c_re + new_re;
     z_im = c_im + new_im;
@@ -64,8 +65,7 @@ function mandelx4(c_re4, c_im4) {
     var mi4 = SIMD.float32x4.lessThanOrEqual(SIMD.float32x4.add(z_re24, z_im24), mandelx4.four4);
 
     // if all 4 values are greater than 4.0, break.
-    if (mi4.signMask === 0x00)
-      break;
+    if (mi4.signMask === 0) break;
 
     var new_re4 = SIMD.float32x4.sub(z_re24, z_im24);
     var new_im4 = SIMD.float32x4.mul(SIMD.float32x4.mul(mandelx4.two4, z_re4), z_im4);
@@ -87,14 +87,14 @@ function mapColorAndSetPixel(x, y, value) {
     g = 0;
     b = 0;
   } else {
-    rgb = (value * 0xffff / max_iterations) * 0xff;
-    r = rgb & 0xff;
-    g = (rgb >> 8) & 0xff;
-    b = (rgb >> 16) & 0xff;
+    rgb = value * 65535 / max_iterations * 255;
+    r = rgb & 255;
+    g = rgb >> 8 & 255;
+    b = rgb >> 16 & 255;
   }
 
   var index = 4 * (x + width * y);
-  image_buffer[index]   = r;
+  image_buffer[index] = r;
   image_buffer[index + 1] = g;
   image_buffer[index + 2] = b;
   image_buffer[index + 3] = 255;
@@ -109,15 +109,15 @@ function drawMandelbrot(params) {
   var yc = params.yc;
   var x0 = xc - 1.5 * scale;
   var y0 = yc - scale;
-  var xd = (3.0 * scale) / width;
-  var yd = (2.0 * scale) / height;
+  var xd = 3 * scale / width;
+  var yd = 2 * scale / height;
 
   if (use_simd) {
     var ydx2 = 2 * yd;
     var ydx3 = 3 * yd;
     var ydx4 = 4 * yd;
-    mandelx4.four4 = SIMD.float32x4.splat(4.0);
-    mandelx4.two4 = SIMD.float32x4.splat(2.0);
+    mandelx4.four4 = SIMD.float32x4.splat(4);
+    mandelx4.two4 = SIMD.float32x4.splat(2);
     mandelx4.one4 = SIMD.int32x4.splat(1);
 
     var xf = x0;

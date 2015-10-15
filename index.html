@@ -7,10 +7,14 @@
     <link rel="manifest" href="manifest.json">
   </head>
   <script>
+    function testMQ(mq) {
+      var result = window.matchMedia(mq).matches;
+      var id = document.getElementById('console');
+      id.innerHTML += mq + ": " + result;
+    }
+
     window.onload = function() {
-      var id = window.getElementById('console');
-      var result = window.matchMedia('(display-mode: standalone)').matches;
-      id.innerHTML = "(display-mode: standalone)" + ": " + result;
+      testMQ('(display-mode: standalone)');
     }
   </script>
   <body>
@@ -19,7 +23,7 @@
         <a href="https://kenchris.github.io/crosswalk-simd-demo/">SIMD.js Demo</a>
       </li>
       <li>
-        <a href="https://kenchris.github.io/WeNEED/">WeNEED! NFC Demo</a>
+        <a href="https://kenchris.github.io/weneed/">WeNEED! NFC Demo</a>
       </li>
       <div id="console"></div>
     </ul>

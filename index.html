@@ -10,7 +10,7 @@
     function testMQ(mq) {
       var result = window.matchMedia(mq).matches;
       var id = document.getElementById('console');
-      id.innerHTML += mq + ": " + result;
+      id.innerHTML += "<p>" + mq + ": " + result + "</p>";
     }
 
     window.onload = function() {
